@@ -6,21 +6,11 @@
 /*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/20 19:37:27 by pperez-m          #+#    #+#             */
-/*   Updated: 2021/10/31 10:14:51 by user42           ###   ########.fr       */
+/*   Updated: 2021/11/01 14:07:55 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	len;
-
-	len = 0;
-	while (s[len] != '\0')
-		len++;
-	return (len);
-}
 
 int	cont_read(char *rline, char c)
 {
@@ -65,31 +55,32 @@ char	*next_line(char **readline)
 	return (line);
 }
 
-int	get_next_line(int fd, char **line)
+char	*get_next_line(int fd)
 {
 	int			nchar;
-	char		buf[BUFFER_SIZE + 1];
+	char		*line = NULL;
+	char		buffer[BUFFER_SIZE + 1];
 	static char	*readline = 0;
 	char		*tmp;
 
 	if (readline == 0)
 		readline = ft_strndup("", 0);
 	nchar = 1;
-	if (!line || fd < 0 || BUFFER_SIZE <= 0)
-		return (-1);
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
 	while (cont_read(readline, '\n') == 0 && nchar > 0)
 	{
-		nchar = read(fd, buf, BUFFER_SIZE);
+		nchar = read(fd, buffer, BUFFER_SIZE);
 		if (nchar == -1)
-			return (-1);
-		buf[nchar] = '\0';
+			return (NULL);
+		buffer[nchar] = '\0';
 		tmp = readline;
-		readline = ft_strjoin(tmp, buf);
+		readline = ft_strjoin(tmp, buffer);
 		free(tmp);
 	}
-	*line = next_line(&readline);
-	printf("line = %s\n", *line);
+	line = next_line(&readline);
+//	printf("line = %c\n", *line);
 	if (nchar == 0)
-		return (0);
-	return (1);
+		return (NULL);
+	return (line);
 }
